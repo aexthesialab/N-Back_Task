@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>ÆX N-Back . 2-Back Task</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #050505;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 16px 120px;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: 40px;
+      color: #d0d0d0;
+    }
+
+    #instructions {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    #instructions p {
+      margin: 10px 0;
+    }
+
+    #letter {
+      font-size: 100px;
+      font-weight: 700;
+      margin: 80px 0 40px;
+      min-height: 120px;
+    }
+
+    .btn {
+      font-size: 20px;
+      padding: 14px 40px;
+      border-radius: 999px;
+      border: 2px solid #54ffd0;
+      background: transparent;
+      color: #54ffd0;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn:hover {
+      background: #54ffd0;
+      color: #050505;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    #startBtn {
+      margin-top: 24px;
+    }
+
+    #mobileTapWrapper {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px 16px 24px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
+      display: none;
+      z-index: 20;
+    }
+
+    #mobileTapBtn {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      display: block;
+      font-size: 18px;
+      padding: 14px 32px;
+    }
+
+    #result {
+      font-size: 18px;
+      line-height: 1.7;
+      margin-top: 32px;
+      text-align: left;
+    }
+
+    #result p {
+      margin: 6px 0;
+    }
+
+    .metric-label {
+      font-weight: 600;
+    }
+
+    .badge-container {
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+
+    .badge-label {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .badge-good {
+      background-color: #1f8a70;
+      color: #ffffff;
+    }
+
+    .badge-normal {
+      background-color: #b38f1b;
+      color: #000000;
+    }
+
+    .badge-watch {
+      background-color: #b3261e;
+      color: #ffffff;
+    }
+
+    #legend {
+      margin-top: 28px;
+    }
+
+    #legend h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    #legend ul {
+      list-style: disc;
+      padding-left: 22px;
+      margin: 0;
+    }
+
+    #legend li {
+      margin-bottom: 6px;
+    }
+
+    .note {
+      font-size: 12px;
+      margin-top: 28px;
+      color: #b0b0b0;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 40px 16px 120px;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      h2 {
+        font-size: 18px;
+        margin-bottom: 28px;
+      }
+      #instructions {
+        font-size: 16px;
+      }
+      #letter {
+        font-size: 80px;
+        margin-top: 60px;
+      }
+      #result {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>2-Back Task</h1>
+    <h2>Compito di memoria di lavoro e aggiornamento continuo</h2>
+
+    <div id="instructions">
+      <p>Premi "Inizia" per cominciare.</p>
+      <p>
+        Su computer. usa la <strong>barra spaziatrice</strong> solo quando la lettera è uguale a quella di
+        <strong>due prove prima</strong>.
+      </p>
+      <p>
+        Su smartphone o tablet. durante il test tocca il pulsante in basso solo quando c'è un
+        <strong>match 2-back</strong>.
+      </p>
+      <p>Premi o tocca solo quando riconosci un <strong>match 2-back</strong>.</p>
+    </div>
+
+    <button id="startBtn" class="btn">Inizia</button>
+
+    <div id="letter" style="display:none;"></div>
+
+    <div id="result"></div>
+  </div>
+
+  <div id="mobileTapWrapper">
+    <button id="mobileTapBtn" class="btn">Tocca quando c'è un match 2-back</button>
+  </div>
+
+  <script>
+    // Sostituisci con la tua Web App Apps Script per N-Back
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzfKAfbv-qdh6lBkIRtMVC-xuV1LkWYkRVdeIURZFTF4MJDyZPULJN6cE1qOKGyZtiQ/exec";
+
+    const N_LEVEL = 2;
+    const NUM_TRIALS = 80;
+    const TARGET_PROB = 0.3;
+    const STIM_MS = 500;
+    const ISI_MS = 1500;
+
+    const LETTERS = "ABCDEFGHJKLMNPQRTUVWYZ".split("");
+
+    const isMobile = /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent);
+    const deviceType = isMobile ? "mobile" : "desktop";
+
+    const startBtn = document.getElementById("startBtn");
+    const mobileTapWrapper = document.getElementById("mobileTapWrapper");
+    const mobileTapBtn = document.getElementById("mobileTapBtn");
+    const letterDiv = document.getElementById("letter");
+    const instructionsDiv = document.getElementById("instructions");
+    const resultDiv = document.getElementById("result");
+
+    let sequence = [];
+    let trials = [];
+    let currentTrial = 0;
+    let trialStartTime = 0;
+    let respondedThisTrial = false;
+    let running = false;
+    let sessionId = "";
+
+    function avg(arr) {
+      if (!arr.length) return 0;
+      return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+
+    function stdDev(arr) {
+      if (arr.length < 2) return 0;
+      const m = avg(arr);
+      const varSum = arr.reduce((s, v) => s + Math.pow(v - m, 2), 0) / (arr.length - 1);
+      return Math.sqrt(varSum);
+    }
+
+    function clamp(x, min, max) {
+      return Math.max(min, Math.min(max, x));
+    }
+
+    function randomLetterDifferentFrom(letter) {
+      const options = LETTERS.filter(l => l !== letter);
+      return options[Math.floor(Math.random() * options.length)];
+    }
+
+    function makeSessionId() {
+      return "AEX-" + Date.now();
+    }
+
+    function classifyPerformance(workingScore, efficiencyScore) {
+      const composite = 0.6 * workingScore + 0.4 * efficiencyScore;
+      let performanceBand, badgeClass, label;
+
+      if (composite >= 80) {
+        performanceBand = "Ottimo";
+        badgeClass = "badge-good";
+        label = "Ottima memoria di lavoro e buona efficienza nel riconoscere i match 2-back.";
+      } else if (composite >= 65) {
+        performanceBand = "Buono";
+        badgeClass = "badge-normal";
+        label = "Performance nella norma. possibili cali di memoria di lavoro o attenzione sotto carico.";
+      } else {
+        performanceBand = "Da monitorare";
+        badgeClass = "badge-watch";
+        label = "In questo test emergono difficoltà nel mantenere e aggiornare le informazioni in memoria di lavoro.";
+      }
+
+      return { performanceBand, badgeClass, label };
+    }
+
+    function handleResponse() {
+      if (!running || respondedThisTrial) return;
+
+      respondedThisTrial = true;
+      const rt = Math.round(performance.now() - trialStartTime);
+      const t = trials[currentTrial - 1];
+
+      t.responded = true;
+      t.rt = rt;
+
+      if (t.isTarget) {
+        t.hit = true;
+        t.miss = false;
+        t.falseAlarm = false;
+        t.correctRejection = false;
+      } else {
+        t.hit = false;
+        t.miss = false;
+        t.falseAlarm = true;
+        t.correctRejection = false;
+      }
+    }
+
+    function handleKeydown(e) {
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        handleResponse();
+      }
+    }
+
+    function generateSequence() {
+      sequence = [];
+      for (let i = 0; i < NUM_TRIALS; i++) {
+        if (i < N_LEVEL) {
+          const letter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+          sequence.push(letter);
+        } else {
+          const makeTarget = Math.random() < TARGET_PROB;
+          if (makeTarget) {
+            sequence.push(sequence[i - N_LEVEL]);
+          } else {
+            const prev = sequence[i - N_LEVEL];
+            sequence.push(randomLetterDifferentFrom(prev));
+          }
+        }
+      }
+    }
+
+    startBtn.addEventListener("click", () => {
+      instructionsDiv.style.display = "none";
+      startBtn.style.display = "none";
+      resultDiv.innerHTML = "";
+      letterDiv.style.display = "block";
+
+      trials = [];
+      currentTrial = 0;
+      respondedThisTrial = false;
+      running = true;
+      sessionId = makeSessionId();
+
+      generateSequence();
+
+      if (isMobile) {
+        mobileTapWrapper.style.display = "block";
+        mobileTapBtn.disabled = false;
+      } else {
+        window.addEventListener("keydown", handleKeydown);
+      }
+
+      nextTrial();
+    });
+
+    if (isMobile) {
+      mobileTapBtn.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+        handleResponse();
+      }, { passive: false });
+
+      mobileTapBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        handleResponse();
+      });
+    }
+
+    function nextTrial() {
+      if (currentTrial >= NUM_TRIALS) {
+        finishTest();
+        return;
+      }
+
+      respondedThisTrial = false;
+
+      const letter = sequence[currentTrial];
+      const isTarget = currentTrial >= N_LEVEL && letter === sequence[currentTrial - N_LEVEL];
+
+      letterDiv.textContent = letter;
+
+      const t = {
+        index: currentTrial + 1,
+        letter: letter,
+        isTarget: isTarget,
+        responded: false,
+        rt: null,
+        hit: false,
+        miss: false,
+        falseAlarm: false,
+        correctRejection: false
+      };
+
+      trials.push(t);
+      currentTrial++;
+      trialStartTime = performance.now();
+
+      setTimeout(() => {
+        letterDiv.textContent = "";
+        setTimeout(() => {
+          if (t.isTarget && !t.responded) {
+            t.miss = true;
+          }
+          if (!t.isTarget && !t.responded) {
+            t.correctRejection = true;
+          }
+          nextTrial();
+        }, ISI_MS);
+      }, STIM_MS);
+    }
+
+    function finishTest() {
+      running = false;
+      letterDiv.style.display = "none";
+
+      if (isMobile) {
+        mobileTapWrapper.style.display = "none";
+      } else {
+        window.removeEventListener("keydown", handleKeydown);
+      }
+
+      let targetCount = 0;
+      let hits = 0;
+      let misses = 0;
+      let falseAlarms = 0;
+      let correctRejections = 0;
+      const rtsHits = [];
+
+      trials.forEach(t => {
+        if (t.isTarget) targetCount++;
+        if (t.hit) {
+          hits++;
+          if (t.rt != null) rtsHits.push(t.rt);
+        }
+        if (t.miss) misses++;
+        if (t.falseAlarm) falseAlarms++;
+        if (t.correctRejection) correctRejections++;
+      });
+
+      const accuracyPercent = targetCount > 0 ? Math.round((hits / targetCount) * 100) : 0;
+      const meanRtHits = rtsHits.length ? Math.round(avg(rtsHits)) : 0;
+      const totalNonTargets = NUM_TRIALS - targetCount;
+
+      const commissionRatePercent =
+        totalNonTargets > 0 ? Math.round((falseAlarms / totalNonTargets) * 100) : 0;
+      const omissionRatePercent =
+        targetCount > 0 ? Math.round((misses / targetCount) * 100) : 0;
+
+      const processingSpeed = meanRtHits;
+      const variability = rtsHits.length ? Math.round(stdDev(rtsHits)) : 0;
+
+      const workingMemoryScore = clamp(
+        accuracyPercent - omissionRatePercent * 0.5 - commissionRatePercent * 0.3,
+        0,
+        100
+      );
+
+      const cognitiveEfficiencyScore = clamp(
+        100 - processingSpeed / 20 - misses - falseAlarms * 1.5,
+        0,
+        100
+      );
+
+      const { performanceBand, badgeClass, label } =
+        classifyPerformance(workingMemoryScore, cognitiveEfficiencyScore);
+
+      const qualityFlag = rtsHits.length >= 10;
+
+      resultDiv.innerHTML = `
+        <h2>Risultati</h2>
+
+        <p><span class="metric-label">Dispositivo utilizzato. </span>${deviceType === "mobile" ? "Smartphone o tablet" : "Computer"}</p>
+        <p><span class="metric-label">Livello N-Back. </span>${N_LEVEL}</p>
+        <p><span class="metric-label">Tempo medio di risposta ai match corretti. </span>${meanRtHits || "-"} ms</p>
+        <p><span class="metric-label">Target totali (match 2-back). </span>${targetCount}</p>
+        <p><span class="metric-label">Risposte corrette ai target (hit). </span>${hits}</p>
+        <p><span class="metric-label">Errori di omissione (nessuna risposta a un match). </span>${misses}</p>
+        <p><span class="metric-label">Errori di commissione (risposta quando non c'era match). </span>${falseAlarms}</p>
+        <p><span class="metric-label">Accuratezza sui target. </span>${accuracyPercent} percent</p>
+
+        <div class="badge-container">
+          <div class="badge-label">Sintesi del tuo profilo in questo test</div>
+          <div class="badge-pill ${badgeClass}">
+            ${label}
+          </div>
+        </div>
+
+        <div id="legend">
+          <h3>Come leggere questi dati</h3>
+          <ul>
+            <li>Il 2-back misura la capacità di mantenere e aggiornare nel tempo le informazioni in memoria di lavoro.</li>
+            <li>Richiede confronto costante tra lo stimolo attuale e quello di due prove prima.</li>
+            <li>Molti errori di omissione possono indicare difficoltà nel mantenere il tracciato della sequenza.</li>
+            <li>Molti errori di commissione possono indicare risposte impulsive o confusione nella rappresentazione.</li>
+          </ul>
+        </div>
+
+        <p class="note">
+          I dati di questo test sono salvati in forma anonima e aggregata.  
+          non raccogliamo nome, email o altri dati che permettano l'identificazione personale.  
+          il tuo codice di sessione è <strong>${sessionId}</strong> e viene usato solo per analisi statistiche interne.
+        </p>
+      `;
+
+      const timestamp = new Date().toISOString();
+
+      const payload = {
+        timestamp: timestamp,
+        session_id: sessionId,
+        device_type: deviceType,
+        n_level: N_LEVEL,
+        total_trials: NUM_TRIALS,
+        target_count: targetCount,
+        hits: hits,
+        omissions: misses,
+        commissions: falseAlarms,
+        correct_rejections: correctRejections,
+        accuracy_percent: accuracyPercent,
+        commission_rate_percent: commissionRatePercent,
+        omission_rate_percent: omissionRatePercent,
+        mean_rt_hits_ms: meanRtHits,
+        processing_speed_ms: processingSpeed,
+        response_variability_ms: variability,
+        working_memory_score: Math.round(workingMemoryScore),
+        cognitive_efficiency_score: Math.round(cognitiveEfficiencyScore),
+        performance_band: performanceBand,
+        quality_flag: qualityFlag
+      };
+
+      fetch(WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        console.error("Errore nell'invio al foglio Google:", err);
+      });
+    }
+  </script>
+</body>
+</html>
